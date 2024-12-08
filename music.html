@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 5 Canciones Chile 2024</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://w.soundcloud.com/player/api.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1DB954, #191414);
+            min-height: 100vh;
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 3rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #1DB954, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        h1::after {
+            content: '2024';
+            position: absolute;
+            bottom: -15px;
+            right: 0;
+            font-size: 1rem;
+            background: #1DB954;
+            padding: 5px 15px;
+            border-radius: 15px;
+            -webkit-text-fill-color: white;
+        }
+
+        .song-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 2rem;
+        }
+
+        .song-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(29, 185, 84, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .song-card:hover::before {
+            opacity: 1;
+        }
+
+        .song-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+            border: 3px solid rgba(29, 185, 84, 0.3);
+        }
+
+        .song-card:hover .song-image {
+            transform: scale(1.05);
+        }
+
+        .song-info {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-right: 80px;
+        }
+
+        .song-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #fff, #1DB954);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .now-playing {
+            background: #1DB954;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .song-card.playing .now-playing {
+            display: inline-block;
+        }
+
+        .song-artist {
+            color: #1DB954;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .song-plays {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .song-plays .stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #1DB954;
+        }
+
+        .play-indicator {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: #1DB954;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
+            z-index: 2;
+        }
+
+        .play-indicator:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+        }
+
+        .play-indicator i {
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .song-card:hover .play-indicator {
+            opacity: 1;
+        }
+
+        .song-card.playing .play-indicator {
+            opacity: 1;
+            animation: pulse 2s infinite;
+        }
+
+        .player-container {
+            display: none;
+            margin-top: 1.5rem;
+            opacity: 0;
+            height: 166px;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            grid-column: 1 / -1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(29, 185, 84, 0.15);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1px;
+        }
+
+        .player-container.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 8px 32px rgba(29, 185, 84, 0.15); }
+            50% { box-shadow: 0 8px 32px rgba(29, 185, 84, 0.3); }
+            100% { box-shadow: 0 8px 32px rgba(29, 185, 84, 0.15); }
+        }
+
+        .player-container iframe {
+            display: block;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .song-card:hover .player-container iframe {
+            transform: scale(1.01);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .song-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 1rem;
+                padding: 1.5rem;
+            }
+
+            .song-image {
+                width: 200px;
+                height: 200px;
+                margin: 0 auto;
+            }
+
+            .play-indicator {
+                position: relative;
+                margin: 1rem auto;
+                transform: none;
+                top: 0;
+                opacity: 1;
+            }
+
+            .page-description {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .player-container {
+                margin-top: 1rem;
+                border-radius: 12px;
+            }
+
+            .player-container iframe {
+                height: 166px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                padding: 1rem;
+                border-radius: 0;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+
+            h1::after {
+                bottom: -10px;
+                font-size: 0.8rem;
+                padding: 3px 10px;
+            }
+
+            .song-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 15px;
+            }
+
+            .song-image {
+                width: 150px;
+                height: 150px;
+            }
+
+            .song-title {
+                font-size: 1.2rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .song-artist {
+                font-size: 1rem;
+            }
+
+            .song-plays .stats {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .player-container {
+                margin-top: 0.8rem;
+                border-radius: 10px;
+            }
+
+            .player-container iframe {
+                height: 166px;
+            }
+
+            .rank-badge {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+                top: 5px;
+                left: 5px;
+            }
+
+            .now-playing {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.6rem;
+            }
+        }
+
+        @supports (padding-top: env(safe-area-inset-top)) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
+        }
+
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            select,
+            textarea,
+            input {
+                font-size: 16px;
+            }
+        }
+
+        .container {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .page-description {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .page-description p {
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .song-details {
+            margin-top: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .song-detail-item {
+            background: rgba(29, 185, 84, 0.15);
+            border: 1px solid rgba(29, 185, 84, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .song-detail-item:hover {
+            background: rgba(29, 185, 84, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .song-detail-item i {
+            color: #1DB954;
+        }
+
+        .song-description {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 480px) {
+            .song-details {
+                justify-content: center;
+            }
+        }
+
+        /* Efectos de partículas y fuego */
+        .song-card.playing::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(29, 185, 84, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(29, 185, 84, 0.1) 0%, transparent 50%);
+            animation: pulse-glow 2s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        /* Efecto de ondas musicales */
+        .song-card.playing .play-indicator::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #1DB954;
+            animation: ripple 1.5s linear infinite;
+            z-index: -1;
+        }
+
+        .song-card.playing .play-indicator::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #1DB954;
+            animation: ripple 1.5s linear infinite 0.75s;
+            z-index: -1;
+        }
+
+        /* Efecto de ecualizador */
+        .song-card.playing .equalizer {
+            display: flex;
+            gap: 3px;
+            height: 20px;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        .equalizer-bar {
+            width: 3px;
+            background: #1DB954;
+            animation: equalize 1s ease-in-out infinite;
+        }
+
+        .equalizer-bar:nth-child(1) { animation-delay: 0.0s; }
+        .equalizer-bar:nth-child(2) { animation-delay: 0.1s; }
+        .equalizer-bar:nth-child(3) { animation-delay: 0.2s; }
+        .equalizer-bar:nth-child(4) { animation-delay: 0.3s; }
+
+        /* Animaciones */
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        @keyframes equalize {
+            0% { height: 5px; }
+            50% { height: 20px; }
+            100% { height: 5px; }
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+            100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+        }
+
+        /* Efecto de fuego en el título */
+        .song-card.playing .song-title {
+            background: linear-gradient(45deg, #ff4d4d, #f9cb28);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fire 2s ease-in-out infinite;
+        }
+
+        @keyframes fire {
+            0% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(30deg); }
+            100% { filter: hue-rotate(0deg); }
+        }
+
+        /* Efecto de brillo en la imagen */
+        .song-card.playing .song-image {
+            animation: shine 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(29, 185, 84, 0.5);
+        }
+
+        @keyframes shine {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+            100% { filter: brightness(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Top Canciones Chile</h1>
+        
+        <div class="page-description">
+            <p>Según datos recopilados hasta diciembre de 2024, estas son las cinco canciones más escuchadas en Chile. Esta lista refleja las preferencias musicales del país y destaca la fuerte presencia de artistas nacionales en el panorama musical.</p>
+        </div>
+
+        <div class="song-card" onclick="togglePlayer('player1', event)">
+            <div class="rank-badge">1</div>
+            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/ca/4e/0f/ca4e0f11-2cbc-7aec-b2e4-53f5fac7cb0e/198309012715-copy-6dfc57c0.png/1200x1200bf-60.jpg" alt="Gata Only" class="song-image">
+            <div class="song-info">
+                <div class="song-title">
+                    Gata Only
+                    <span class="now-playing">
+                        Reproduciendo
+                        <div class="equalizer">
+                            <div class="equalizer-bar"></div>
+                            <div class="equalizer-bar"></div>
+                            <div class="equalizer-bar"></div>
+                            <div class="equalizer-bar"></div>
+                        </div>
+                    </span>
+                </div>
+                <div class="song-artist">FloyyMenor y Cris MJ</div>
+                <div class="song-plays">
+                    <i class="fas fa-headphones"></i>
+                    <div class="stats">
+                        <span><i class="fas fa-chart-line"></i> Más de 1.000M reproducciones globales</span>
+                        <span><i class="fas fa-trophy"></i> #1 en Chile</span>
+                    </div>
+                </div>
+                <div class="song-details">
+                    <div class="song-detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>Lanzamiento: 2024</span>
+                    </div>
+                    <div class="song-detail-item">
+                        <i class="fas fa-music"></i>
+                        <span>Género: Urbano Latino</span>
+                    </div>
+                    <div class="song-detail-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Duración: 3:15</span>
+                    </div>
+                </div>
+                <div class="song-description">
+                    Una de las colaboraciones más exitosas del año, combinando el estilo único de FloyyMenor con el talento de Cris MJ. La canción rápidamente se convirtió en un fenómeno viral en Chile.
+                </div>
+                <div class="play-indicator" onclick="togglePlayer('player1', event)">
+                    <i class="fas fa-play"></i>
+                </div>
+            </div>
+            <div class="player-container" id="player1">
+                <iframe 
+                    width="100%" 
+                    height="166" 
+                    scrolling="no" 
+                    frameborder="no" 
+                    allow="autoplay" 
+                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1721423787&color=%231DB954&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false">
+                </iframe>
+            </div>
+        </div>
+
+        <div class="song-card" onclick="togglePlayer('player2', event)">
+            <div class="rank-badge">2</div>
+            <img src="https://i1.sndcdn.com/artworks-RByZR5QJljbGjMYx-m9kbQg-t500x500.jpg" alt="Daytona" class="song-image">
+            <div class="song-info">
+                <div class="song-title">
+                    Daytona
+                    <span class="now-playing">Reproduciendo</span>
+                </div>
+                <div class="song-artist">Cris MJ</div>
+                <div class="song-plays">
+                    <i class="fas fa-headphones"></i>
+                    <div class="stats">
+                        <span><i class="fas fa-fire"></i> Top Trending en Chile</span>
+                        <span><i class="fas fa-trophy"></i> #2 en Chile</span>
+                    </div>
+                </div>
+                <div class="song-details">
+                    <div class="song-detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>Lanzamiento: 2024</span>
+                    </div>
+                    <div class="song-detail-item">
+                        <i class="fas fa-music"></i>
+                        <span>Género: Reggaetón</span>
+                    </div>
+                    <div class="song-detail-item">
+                        <i class="fas fa-microphone"></i>
+                        <span>Producción: Cris MJ</span>
+                    </div>
+                </div>
+                <div class="song-description">
+                    Un hit que demuestra la evolución musical de Cris MJ, mezclando ritmos modernos con letras pegajosas que han cautivado al público chileno.
+                </div>
+                <div class="play-indicator" onclick="togglePlayer('player2', event)">
+                    <i class="fas fa-play"></i>
+                </div>
+            </div>
+            <div class="player-container" id="player2">
+                <iframe 
+                    width="100%" 
+                    height="166" 
+                    scrolling="no" 
+                    frameborder="no" 
+                    allow="autoplay" 
+                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1661008809&color=%231DB954&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false">
+                </iframe>
+            </div>
+        </div>
+
+        <div class="song-card" onclick="togglePlayer('player3', event)">
+            <div class="rank-badge">3</div>
+            <img src="https://s.mxmcdn.net/images-storage/albums2/9/7/2/2/3/3/71332279_800_800.jpg" alt="PRINCESITA DE..." class="song-image">
+            <div class="song-info">
+                <div class="song-title">
+                    PRINCESITA DE...
+                    <span class="now-playing">Reproduciendo</span>
+                </div>
+                <div class="song-artist">Jere Klein, Nickoog Clk, Lucky Brown y El BAI</div>
+                <div class="song-plays">
+                    <i class="fas fa-headphones"></i>
+                    <div class="stats">
+                        <span><i class="fas fa-fire"></i> Top Trending en Chile</span>
+                        <span><i class="fas fa-trophy"></i> #3 en Chile</span>
+                    </div>
+                </div>
+                <div class="song-details">
+                    <div class="song-detail-item">
+                        <i class="fas fa-users"></i>
+                        <span>Colaboración múltiple</span>
+                    </div>
+                    <div class="song-detail-item">
+                        <i class="fas fa-star"></i>
+                        <span>Hit del Verano 2024</span>
+                    </div>
+                </div>
+                <div class="song-description">
+                    Una colaboración explosiva que reúne a algunos de los artistas más destacados de la escena urbana chilena.
+                </div>
+                <div class="play-indicator" onclick="togglePlayer('player3', event)">
+                    <i class="fas fa-play"></i>
+                </div>
+            </div>
+            <div class="player-container" id="player3">
+                <iframe 
+                    width="100%" 
+                    height="166" 
+                    scrolling="no" 
+                    frameborder="no" 
+                    allow="autoplay" 
+                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1665779676&color=%231DB954&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false">
+                </iframe>
+            </div>
+        </div>
+
+        <div class="song-card" onclick="togglePlayer('player4', event)">
+            <div class="rank-badge">4</div>
+            <img src="https://national-report.com/wp-content/uploads/2024/02/ntr_luna_9469684913.png" alt="LUNA" class="song-image">
+            <div class="song-info">
+                <div class="song-title">
+                    LUNA
+                    <span class="now-playing">Reproduciendo</span>
+                </div>
+                <div class="song-artist">Feid y ATL Jacob</div>
+                <div class="song-plays">
+                    <i class="fas fa-headphones"></i>
+                    <div class="stats">
+                        <span><i class="fas fa-fire"></i> Top Trending en Chile</span>
+                        <span><i class="fas fa-trophy"></i> #4 en Chile</span>
+                    </div>
+                </div>
+                <div class="song-details">
+                    <div class="song-detail-item">
+                        <i class="fas fa-globe"></i>
+                        <span>Hit Internacional</span>
+                    </div>
+                    <div class="song-detail-item">
+                        <i class="fas fa-music"></i>
+                        <span>Trap Latino</span>
+                    </div>
+                </div>
+                <div class="song-description">
+                    Una colaboración internacional que ha conquistado las listas de reproducción en Chile y Latinoamérica.
+                </div>
+                <div class="play-indicator" onclick="togglePlayer('player4', event)">
+                    <i class="fas fa-play"></i>
+                </div>
+            </div>
+            <div class="player-container" id="player4">
+                <iframe 
+                    width="100%" 
+                    height="166" 
+                    scrolling="no" 
+                    frameborder="no" 
+                    allow="autoplay" 
+                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1683090669&color=%231DB954&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false">
+                </iframe>
+            </div>
+        </div>
+
+        <div class="song-card" onclick="togglePlayer('player5', event)">
+            <div class="rank-badge">5</div>
+            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/01/49/6b/01496bf4-bedb-6dba-3d42-d9ca6b7ac23e/198588161319.jpg/800x800cc.jpg" alt="SI NO ES CONTIGO" class="song-image">
+            <div class="song-info">
+                <div class="song-title">
+                    SI NO ES CONTIGO
+                    <span class="now-playing">Reproduciendo</span>
+                </div>
+                <div class="song-artist">Cris MJ</div>
+                <div class="song-plays">
+                    <i class="fas fa-headphones"></i>
+                    <div class="stats">
+                        <span><i class="fas fa-fire"></i> Top Trending en Chile</span>
+                        <span><i class="fas fa-trophy"></i> #5 en Chile</span>
+                    </div>
+                </div>
+                <div class="song-details">
+                    <div class="song-detail-item">
+                        <i class="fas fa-heart"></i>
+                        <span>Balada Urbana</span>
+                    </div>
+                    <div class="song-detail-item">
+                        <i class="fas fa-star"></i>
+                        <span>Hit del Momento</span>
+                    </div>
+                </div>
+                <div class="song-description">
+                    Una balada urbana que muestra el lado más romántico de Cris MJ, demostrando su versatilidad como artista.
+                </div>
+                <div class="play-indicator" onclick="togglePlayer('player5', event)">
+                    <i class="fas fa-play"></i>
+                </div>
+            </div>
+            <div class="player-container" id="player5">
+                <iframe 
+                    width="100%" 
+                    height="166" 
+                    scrolling="no" 
+                    frameborder="no" 
+                    allow="autoplay" 
+                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1822965447&color=%231DB954&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false">
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let players = {};
+
+        function initializePlayers() {
+            document.querySelectorAll('.player-container iframe').forEach(iframe => {
+                const player = SC.Widget(iframe);
+                players[iframe.parentElement.id] = player;
+
+                player.bind(SC.Widget.Events.READY, () => {
+                    player.bind(SC.Widget.Events.PLAY, () => {
+                        // Pausar otros reproductores cuando uno comienza a reproducir
+                        Object.entries(players).forEach(([id, p]) => {
+                            if (id !== iframe.parentElement.id) {
+                                p.pause();
+                                const otherCard = document.querySelector(`#${id}`).closest('.song-card');
+                                otherCard.classList.remove('playing');
+                                otherCard.querySelector('.play-indicator i').className = 'fas fa-play';
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        function togglePlayer(playerId, event) {
+            const player = document.getElementById(playerId);
+            const card = player.closest('.song-card');
+            const playIndicator = card.querySelector('.play-indicator');
+            const allCards = document.querySelectorAll('.song-card');
+            
+            // Prevenir que el clic en la tarjeta active la reproducción
+            if (!event.target.closest('.play-indicator')) {
+                return;
+            }
+            
+            event.stopPropagation(); // Evitar la propagación del evento
+            
+            allCards.forEach(c => {
+                if (c !== card) {
+                    c.classList.remove('playing');
+                    const p = c.querySelector('.player-container');
+                    const pi = c.querySelector('.play-indicator i');
+                    p.classList.remove('active');
+                    pi.className = 'fas fa-play';
+                    if (players[p.id]) {
+                        players[p.id].pause();
+                    }
+                }
+            });
+            
+            if (!player.classList.contains('active')) {
+                player.classList.add('active');
+                card.classList.add('playing');
+                playIndicator.querySelector('i').className = 'fas fa-pause';
+                if (players[playerId]) {
+                    players[playerId].play();
+                }
+            } else {
+                player.classList.remove('active');
+                card.classList.remove('playing');
+                playIndicator.querySelector('i').className = 'fas fa-play';
+                if (players[playerId]) {
+                    players[playerId].pause();
+                }
+            }
+        }
+
+        // Inicializar los reproductores cuando la página cargue
+        window.addEventListener('load', initializePlayers);
+    </script>
+</body>
+</html>
